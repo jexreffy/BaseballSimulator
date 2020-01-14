@@ -1162,7 +1162,6 @@ GameObject:
   - component: {fileID: 824061404}
   - component: {fileID: 824061403}
   - component: {fileID: 824061402}
-  - component: {fileID: 824061401}
   - component: {fileID: 824061400}
   m_Layer: 0
   m_Name: GameController
@@ -1189,22 +1188,9 @@ MonoBehaviour:
     type: 3}
   redBallPrefab: {fileID: 2813528046161498401, guid: 9a682b2a12b89d14289128e20953e699,
     type: 3}
-  pitchPoint: {x: 0, y: 1, z: 0.5}
+  pitchPoint: {x: 0, y: 1, z: -0.5}
   whiteChance: 0.6
   goldChance: 0.2
---- !u!65 &824061401
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 824061399}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &824061402
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1263,7 +1249,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 2, z: 0.5}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &876257677
 GameObject:
