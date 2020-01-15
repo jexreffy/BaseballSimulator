@@ -13,6 +13,10 @@ public class GameController : MonoBehaviour {
     public float whiteChance = 0.6f;
     public float goldChance = 0.2f;
 
+    public int whiteMultiplier = 1;
+    public int goldMultiplier = 2;
+    public int redMultiplier = -1;
+
     private bool _hasStarted;
     private float _pitchTime = -10f;
     
@@ -30,14 +34,17 @@ public class GameController : MonoBehaviour {
             var newBall = Instantiate(whiteBallPrefab, Vector3.zero, Quaternion.identity);
             newBall.SetActive(false);
             _whiteBalls.Add(newBall.GetComponent<Ball>());
+            _whiteBalls[_whiteBalls.Count - 1].InitializeBall(this, whiteMultiplier);
             
             newBall = Instantiate(goldBallPrefab, Vector3.zero, Quaternion.identity);
             newBall.SetActive(false);
             _goldBalls.Add(newBall.GetComponent<Ball>());
+            _goldBalls[_goldBalls.Count - 1].InitializeBall(this, goldMultiplier);
             
             newBall = Instantiate(redBallPrefab, Vector3.zero, Quaternion.identity);
             newBall.SetActive(false);
             _redBalls.Add(newBall.GetComponent<Ball>());
+            _redBalls[_redBalls.Count - 1].InitializeBall(this, redMultiplier);
         }
     }
 
@@ -51,7 +58,7 @@ public class GameController : MonoBehaviour {
         if (Time.time < _pitchTime) return;
         
         var ball = _ballsToPitch.Dequeue();
-        ball.ResetBall(transform.position + pitchPoint, new Vector3(0, 5f, -15f));
+        ball.ResetBall(transform.position + pitchPoint, new Vector3(0, 0.45f, -1.5f));
 
         _hasStarted = _ballsToPitch.Count > 0;
         _pitchTime = Time.time + PITCH_DELAY;
@@ -79,5 +86,9 @@ public class GameController : MonoBehaviour {
                 _ballsToPitch.Enqueue(_redBalls[redCount++]);
             }
         }
+    }
+
+    public void OnBallFinished(float distance, int multiplier, bool fair, bool homeRun) {
+        Debug.Log($"{Time.time} {multiplier} Ball went {distance} units {(homeRun ? "and was a home run " : fair ? "and was fair " : "and was foul")}");
     }
 }

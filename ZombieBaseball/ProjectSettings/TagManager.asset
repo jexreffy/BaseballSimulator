@@ -8,6 +8,10 @@ TagManager:
   - Foul
   - HomeRun
   - Bat
+  - Ground
+  - GreenZone
+  - YellowZone
+  - RedZone
   layers:
   - Default
   - TransparentFX
@@ -17,9 +21,9 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
+  - Ball
+  - Bat
+  - Ground
   - 
   - 
   - 
