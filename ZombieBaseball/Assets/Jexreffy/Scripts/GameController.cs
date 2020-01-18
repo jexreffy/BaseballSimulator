@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameController : MonoBehaviour {
@@ -10,6 +11,10 @@ public class GameController : MonoBehaviour {
 
     public Vector3 pitchPoint;
 
+    public TextMeshPro BallCount;
+    public TextMeshPro LastCount;
+    public TextMeshPro ScoreCount;
+
     public float whiteChance = 0.6f;
     public float goldChance = 0.2f;
 
@@ -17,8 +22,11 @@ public class GameController : MonoBehaviour {
     public int goldMultiplier = 2;
     public int redMultiplier = -1;
 
+    public int homeRunScore = 50;
+
     private bool _hasStarted;
     private float _pitchTime = -10f;
+    private int _currentScore;
     
     private List<Ball> _whiteBalls = new List<Ball>();
     private List<Ball> _goldBalls = new List<Ball>();
@@ -46,6 +54,10 @@ public class GameController : MonoBehaviour {
             _redBalls.Add(newBall.GetComponent<Ball>());
             _redBalls[_redBalls.Count - 1].InitializeBall(this, redMultiplier);
         }
+        
+        BallCount.SetText("0");
+        LastCount.SetText("0");
+        ScoreCount.SetText("0");
     }
 
     void Start() {
@@ -60,6 +72,8 @@ public class GameController : MonoBehaviour {
         var ball = _ballsToPitch.Dequeue();
         ball.ResetBall(transform.position + pitchPoint, new Vector3(0, 0.45f, -1.5f));
 
+        BallCount.SetText(_ballsToPitch.Count.ToString());
+        
         _hasStarted = _ballsToPitch.Count > 0;
         _pitchTime = Time.time + PITCH_DELAY;
     }
@@ -86,9 +100,22 @@ public class GameController : MonoBehaviour {
                 _ballsToPitch.Enqueue(_redBalls[redCount++]);
             }
         }
+        
+        BallCount.SetText(NUM_BALLS.ToString());
+        LastCount.SetText("0");
+        ScoreCount.SetText("0");
     }
 
     public void OnBallFinished(float distance, int multiplier, bool fair, bool homeRun) {
         Debug.Log($"{Time.time} {multiplier} Ball went {distance} units {(homeRun ? "and was a home run " : fair ? "and was fair " : "and was foul")}");
+        var newScore = 0;
+        if (fair) {
+            newScore = Mathf.FloorToInt(distance * multiplier + (homeRun ? homeRunScore : 0));
+            _currentScore = Mathf.Max(_currentScore + newScore, 0);
+            LastCount.SetText(newScore.ToString());
+            ScoreCount.SetText(_currentScore.ToString());
+        } else {
+            LastCount.SetText(newScore.ToString());
+        }
     }
 }
