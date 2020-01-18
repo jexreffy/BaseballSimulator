@@ -60,10 +60,6 @@ public class GameController : MonoBehaviour {
         ScoreCount.SetText("0");
     }
 
-    void Start() {
-        OnStartGame();
-    }
-
     void Update() {
         if (!_hasStarted) return;
 
@@ -78,7 +74,9 @@ public class GameController : MonoBehaviour {
         _pitchTime = Time.time + PITCH_DELAY;
     }
 
-    private void OnStartGame() {
+    public bool HasStarted => _hasStarted;
+
+    public void OnStartGame() {
         _hasStarted = true;
         _pitchTime = Time.time + PITCH_DELAY;
         
