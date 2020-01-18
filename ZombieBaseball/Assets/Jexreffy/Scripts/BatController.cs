@@ -27,6 +27,7 @@ public class BatController : MonoBehaviour {
         if (_triggerHoldTime > 0 && Time.time >= _triggerHoldTime) {
             gameController.OnStartGame();
             instructionCanvas.gameObject.SetActive(false);
+            _triggerHoldTime = -10f;
         }
     }
     
