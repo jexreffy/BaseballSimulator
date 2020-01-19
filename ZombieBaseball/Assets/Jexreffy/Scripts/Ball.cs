@@ -61,7 +61,7 @@ public class Ball : MonoBehaviour {
 
         if (other.gameObject.layer != GROUND_LAYER) return;
         
-        if (_isHit) _gameController.OnBallFinished(_transform.position.magnitude, _multiplier, _isFair, _isHomeRun);
+        _gameController.OnBallFinished(_isHit ? _transform.position.magnitude : 0, _multiplier, _isFair, _isHomeRun);
         gameObject.SetActive(false);
     }
 

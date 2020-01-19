@@ -13,7 +13,9 @@ public class GameController : MonoBehaviour {
 
     public TextMeshPro BallCount;
     public TextMeshPro LastCount;
+    public TextMeshPro HomeRunsCount;
     public TextMeshPro ScoreCount;
+    public List<TextMeshPro> HighScores = new List<TextMeshPro>();
 
     public float whiteChance = 0.6f;
     public float goldChance = 0.2f;
@@ -25,8 +27,13 @@ public class GameController : MonoBehaviour {
     public int homeRunScore = 50;
 
     private bool _hasStarted;
+    private bool _hasFinished;
     private float _pitchTime = -10f;
+    private int _ballsCounted;
     private int _currentScore;
+    private int _currentHomeRuns;
+
+    private SaveState _saveState;
     
     private List<Ball> _whiteBalls = new List<Ball>();
     private List<Ball> _goldBalls = new List<Ball>();
@@ -57,7 +64,14 @@ public class GameController : MonoBehaviour {
         
         BallCount.SetText("0");
         LastCount.SetText("0");
+        HomeRunsCount.SetText("0");
         ScoreCount.SetText("0");
+        
+        _saveState = SaveState.Load();
+        
+        for (var i = 0; i < HighScores.Count; i++) {
+            if (i < _saveState.highScores.Count) HighScores[i].SetText(_saveState.highScores[i].ToString());
+        }
     }
 
     void Update() {
@@ -75,9 +89,12 @@ public class GameController : MonoBehaviour {
     }
 
     public bool HasStarted => _hasStarted;
+    public bool HasFinished => _hasFinished;
 
     public void OnStartGame() {
         _hasStarted = true;
+        _hasFinished = false;
+        _ballsCounted = 0;
         _pitchTime = Time.time + PITCH_DELAY;
         
         _ballsToPitch.Clear();
@@ -101,19 +118,46 @@ public class GameController : MonoBehaviour {
         
         BallCount.SetText(NUM_BALLS.ToString());
         LastCount.SetText("0");
+        HomeRunsCount.SetText("0");
         ScoreCount.SetText("0");
     }
 
     public void OnBallFinished(float distance, int multiplier, bool fair, bool homeRun) {
         Debug.Log($"{Time.time} {multiplier} Ball went {distance} units {(homeRun ? "and was a home run " : fair ? "and was fair " : "and was foul")}");
+        _ballsCounted++;
         var newScore = 0;
         if (fair) {
             newScore = Mathf.FloorToInt(distance * multiplier + (homeRun ? homeRunScore : 0));
             _currentScore = Mathf.Max(_currentScore + newScore, 0);
+            if (homeRun) _currentHomeRuns++;
             LastCount.SetText(newScore.ToString());
+            HomeRunsCount.SetText(_currentHomeRuns.ToString());
             ScoreCount.SetText(_currentScore.ToString());
         } else {
             LastCount.SetText(newScore.ToString());
         }
+
+        if (_ballsToPitch.Count <= 0 && _ballsCounted >= NUM_BALLS) ResolveHighScores();
+    }
+
+    private void ResolveHighScores() {
+        _hasStarted = false;
+        _hasFinished = true;
+
+        var found = false;
+        for (var i = 0; i < _saveState.highScores.Count; i++) {
+            if (_saveState.highScores[i] >= _currentScore) continue;
+            found = true;
+            _saveState.highScores.Insert(i, _currentScore);
+            break;
+        }
+        
+        if (!found) _saveState.highScores.Add(_currentScore);
+
+        for (var i = 0; i < HighScores.Count; i++) {
+            if (i < _saveState.highScores.Count) HighScores[i].SetText(_saveState.highScores[i].ToString());
+        }
+       
+        _saveState.Save();
     }
 }

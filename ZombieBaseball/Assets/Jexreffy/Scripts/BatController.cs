@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
 using VRTK;
@@ -14,6 +15,7 @@ public class BatController : MonoBehaviour {
     public Image radialProgress;
 
     private float _triggerHoldTime = -10f;
+    private bool _inProgress;
     
     private VRTK_ControllerEvents _events;
 
@@ -24,10 +26,16 @@ public class BatController : MonoBehaviour {
     }
 
     void Update() {
+        if (_inProgress && gameController.HasFinished) {
+            instructionCanvas.gameObject.SetActive(true);
+            _inProgress = false;
+        }
+        
         if (gameController.HasStarted || _triggerHoldTime <= 0) return;
         
         if (Time.time >= _triggerHoldTime) {
             gameController.OnStartGame();
+            _inProgress = true;
             instructionCanvas.gameObject.SetActive(false);
             _triggerHoldTime = -10f;
             radialProgress.gameObject.SetActive(false);
