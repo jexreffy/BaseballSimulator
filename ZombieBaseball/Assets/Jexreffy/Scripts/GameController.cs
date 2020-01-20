@@ -16,6 +16,8 @@ public class GameController : MonoBehaviour {
     public TextMeshPro HomeRunsCount;
     public TextMeshPro ScoreCount;
     public List<TextMeshPro> HighScores = new List<TextMeshPro>();
+    
+    public List<ParticleSystem> confettiShooters = new List<ParticleSystem>();
 
     public float whiteChance = 0.6f;
     public float goldChance = 0.2f;
@@ -134,6 +136,10 @@ public class GameController : MonoBehaviour {
         _currentScore += homeRunScore;
         HomeRunsCount.SetText(_currentHomeRuns.ToString());
         ScoreCount.SetText(_currentScore.ToString());
+        for (var i = 0; i < confettiShooters.Count; i++) {
+            confettiShooters[i].Clear();
+            confettiShooters[i].Play();
+        }
     }
 
     public void OnBallFinished(float distance, int multiplier, bool fair, bool homeRun) {
