@@ -94,10 +94,18 @@ public class GameController : MonoBehaviour {
     public void OnStartGame() {
         _hasStarted = true;
         _hasFinished = false;
+        _currentScore = 0;
+        _currentHomeRuns = 0;
         _ballsCounted = 0;
         _pitchTime = Time.time + PITCH_DELAY;
         
         _ballsToPitch.Clear();
+        
+        for (var i = 0; i < NUM_BALLS; i++) {
+            _whiteBalls[i].gameObject.SetActive(false);
+            _goldBalls[i].gameObject.SetActive(false);
+            _redBalls[i].gameObject.SetActive(false);
+        }
 
         var whiteCount = 0;
         var goldCount = 0;
@@ -122,12 +130,18 @@ public class GameController : MonoBehaviour {
         ScoreCount.SetText("0");
     }
 
+    public void OnHomeRunTriggerd() {
+        _currentScore += homeRunScore;
+        HomeRunsCount.SetText(_currentHomeRuns.ToString());
+        ScoreCount.SetText(_currentScore.ToString());
+    }
+
     public void OnBallFinished(float distance, int multiplier, bool fair, bool homeRun) {
         Debug.Log($"{Time.time} {multiplier} Ball went {distance} units {(homeRun ? "and was a home run " : fair ? "and was fair " : "and was foul")}");
         _ballsCounted++;
         var newScore = 0;
         if (fair) {
-            newScore = Mathf.FloorToInt(distance * multiplier + (homeRun ? homeRunScore : 0));
+            newScore = Mathf.FloorToInt(distance * multiplier);
             _currentScore = Mathf.Max(_currentScore + newScore, 0);
             if (homeRun) _currentHomeRuns++;
             LastCount.SetText(newScore.ToString());

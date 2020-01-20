@@ -17,11 +17,13 @@ public class BatController : MonoBehaviour {
     private float _triggerHoldTime = -10f;
     private bool _inProgress;
     
+    private AudioSource _audio;
     private VRTK_ControllerEvents _events;
 
-    private const float TRIGGER_HOLD_TIME = 2;
+    private const float TRIGGER_HOLD_TIME = 1;
     
     void Awake() {
+        _audio = GetComponent<AudioSource>();
         _events = GetComponent<VRTK_ControllerEvents>();
     }
 
@@ -70,6 +72,7 @@ public class BatController : MonoBehaviour {
         _triggerHoldTime = Time.time + TRIGGER_HOLD_TIME;
         radialProgress.gameObject.SetActive(true);
         radialProgress.fillAmount = 0f;
+        _audio.Play();
     }
     
     private void OnTriggerReleased(object sender, ControllerInteractionEventArgs e) {
@@ -78,5 +81,6 @@ public class BatController : MonoBehaviour {
         _triggerHoldTime = -10f;
         radialProgress.gameObject.SetActive(false);
         radialProgress.fillAmount = 0f;
+        _audio.Stop();
     }
 }

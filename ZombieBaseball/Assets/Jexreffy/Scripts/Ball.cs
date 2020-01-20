@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour {
 
+    public AudioClip thrownSound;
+    public AudioClip hitSound;
+    public AudioClip homeRunSound;
+    
     private bool _isHit;
     private bool _isDetermined;
     private bool _isFair;
@@ -12,6 +16,7 @@ public class Ball : MonoBehaviour {
 
     private int _multiplier;
 
+    private AudioSource _audio;
     private GameController _gameController;
     private Transform _transform;
     private Rigidbody _rigidbody;
@@ -39,6 +44,7 @@ public class Ball : MonoBehaviour {
         }
         _transform = transform;
         _rigidbody = GetComponent<Rigidbody>();
+        _audio = GetComponent<AudioSource>();
     }
 
     void OnCollisionEnter(Collision other) {
@@ -55,6 +61,7 @@ public class Ball : MonoBehaviour {
             }
             
             _rigidbody.AddForce(other.impulse * multiplier, ForceMode.Impulse);
+            _audio.PlayOneShot(hitSound);
         } else if (_isHit && !_isDetermined) {
             DeterimeBall(other.gameObject.tag);
         }
@@ -62,7 +69,10 @@ public class Ball : MonoBehaviour {
         if (other.gameObject.layer != GROUND_LAYER) return;
         
         _gameController.OnBallFinished(_isHit ? _transform.position.magnitude : 0, _multiplier, _isFair, _isHomeRun);
-        gameObject.SetActive(false);
+        _rigidbody.velocity = Vector3.zero;
+        _rigidbody.angularVelocity = Vector3.zero;
+        _rigidbody.detectCollisions = false;
+        _rigidbody.useGravity = false;
     }
 
     void OnTriggerEnter(Collider other) {
@@ -77,7 +87,12 @@ public class Ball : MonoBehaviour {
         var foul    = otherTag.Equals(FOUL_TAG);
 
         if (!homeRun && !fair && !foul) return;
-        
+
+        if (homeRun) {
+            _audio.PlayOneShot(homeRunSound);
+            _gameController.OnHomeRunTriggerd();
+        }
+
         _isHomeRun    = homeRun;
         _isFair       = homeRun || fair;
         _isDetermined = true;
@@ -98,7 +113,11 @@ public class Ball : MonoBehaviour {
 
         _rigidbody.velocity = Vector3.zero;
         _rigidbody.angularVelocity = Vector3.zero;
+        _rigidbody.detectCollisions = true;
+        _rigidbody.useGravity = true;
         
         _rigidbody.AddForce(force, ForceMode.Impulse);
+        
+        _audio.PlayOneShot(thrownSound);
     }
 }
