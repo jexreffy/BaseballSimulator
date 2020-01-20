@@ -76,8 +76,13 @@ public class Ball : MonoBehaviour {
         if (_transform.position.magnitude > BEACON_MINIMUM) {
             beacon.gameObject.SetActive(true);
         }
+
+        var position = _transform.position;
+        _gameController.OnBallFinished(_isHit ? position.magnitude : 0, _multiplier, _isFair, _isHomeRun);
         
-        _gameController.OnBallFinished(_isHit ? _transform.position.magnitude : 0, _multiplier, _isFair, _isHomeRun);
+        position = new Vector3(position.x, 0.1f, position.z);
+        _transform.position = position;
+        _transform.rotation = Quaternion.identity;
         _rigidbody.velocity = Vector3.zero;
         _rigidbody.angularVelocity = Vector3.zero;
         _rigidbody.detectCollisions = false;
