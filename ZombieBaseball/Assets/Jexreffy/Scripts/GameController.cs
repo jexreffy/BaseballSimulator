@@ -27,6 +27,10 @@ public class GameController : MonoBehaviour {
     public int redMultiplier = -1;
 
     public int homeRunScore = 50;
+    
+    public AudioClip homeRunSound;
+    public AudioClip homeBadSound;
+    public AudioClip highScoreSound;
 
     private bool _hasStarted;
     private bool _hasFinished;
@@ -43,10 +47,14 @@ public class GameController : MonoBehaviour {
     
     private Queue<Ball> _ballsToPitch = new Queue<Ball>();
 
+    private AudioSource _audio;
+
     private int NUM_BALLS = 30;
     private float PITCH_DELAY = 5f;
 
     void Awake() {
+        _audio = GetComponent<AudioSource>();
+        
         for (var i = 0; i < NUM_BALLS; i++) {
             var newBall = Instantiate(whiteBallPrefab, Vector3.zero, Quaternion.identity);
             newBall.SetActive(false);
@@ -132,10 +140,13 @@ public class GameController : MonoBehaviour {
         ScoreCount.SetText("0");
     }
 
-    public void OnHomeRunTriggerd() {
+    public void OnHomeRunTriggerd(int multiplier) {
         _currentScore += homeRunScore;
         HomeRunsCount.SetText(_currentHomeRuns.ToString());
         ScoreCount.SetText(_currentScore.ToString());
+        
+        _audio.PlayOneShot(multiplier > 0 ? homeRunSound : homeBadSound);
+        
         for (var i = 0; i < confettiShooters.Count; i++) {
             confettiShooters[i].Clear();
             confettiShooters[i].Play();
@@ -169,10 +180,30 @@ public class GameController : MonoBehaviour {
             if (_saveState.highScores[i] >= _currentScore) continue;
             found = true;
             _saveState.highScores.Insert(i, _currentScore);
+
+            if (i < HighScores.Count) {
+                _audio.PlayOneShot(highScoreSound);
+        
+                for (var j = 0; j < confettiShooters.Count; j++) {
+                    confettiShooters[j].Clear();
+                    confettiShooters[j].Play();
+                }
+            }
             break;
         }
+
+        if (!found) {
+            _saveState.highScores.Add(_currentScore);
+            
+            if (_saveState.highScores.Count - 1 < HighScores.Count) {
+                _audio.PlayOneShot(highScoreSound);
         
-        if (!found) _saveState.highScores.Add(_currentScore);
+                for (var j = 0; j < confettiShooters.Count; j++) {
+                    confettiShooters[j].Clear();
+                    confettiShooters[j].Play();
+                }
+            }
+        }
 
         for (var i = 0; i < HighScores.Count; i++) {
             if (i < _saveState.highScores.Count) HighScores[i].SetText(_saveState.highScores[i].ToString());

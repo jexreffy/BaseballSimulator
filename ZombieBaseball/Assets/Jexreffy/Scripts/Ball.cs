@@ -7,8 +7,9 @@ public class Ball : MonoBehaviour {
 
     public AudioClip thrownSound;
     public AudioClip hitSound;
-    public AudioClip homeRunSound;
-    
+
+    public Light beacon;
+
     private bool _isHit;
     private bool _isDetermined;
     private bool _isFair;
@@ -37,6 +38,8 @@ public class Ball : MonoBehaviour {
     private const float YELLOW_MULTIPLIER = 0.3f;
     private const float RED_MULTIPLIER = 0.1f;
 
+    private const float BEACON_MINIMUM = 30;
+
     void Awake() {
         if (GROUND_LAYER <= 0) {
             GROUND_LAYER = LayerMask.NameToLayer(GROUND_TAG);
@@ -45,6 +48,8 @@ public class Ball : MonoBehaviour {
         _transform = transform;
         _rigidbody = GetComponent<Rigidbody>();
         _audio = GetComponent<AudioSource>();
+        
+        beacon.gameObject.SetActive(false);
     }
 
     void OnCollisionEnter(Collision other) {
@@ -67,6 +72,10 @@ public class Ball : MonoBehaviour {
         }
 
         if (other.gameObject.layer != GROUND_LAYER) return;
+
+        if (_transform.position.magnitude > BEACON_MINIMUM) {
+            beacon.gameObject.SetActive(true);
+        }
         
         _gameController.OnBallFinished(_isHit ? _transform.position.magnitude : 0, _multiplier, _isFair, _isHomeRun);
         _rigidbody.velocity = Vector3.zero;
@@ -89,8 +98,7 @@ public class Ball : MonoBehaviour {
         if (!homeRun && !fair && !foul) return;
 
         if (homeRun) {
-            _audio.PlayOneShot(homeRunSound);
-            _gameController.OnHomeRunTriggerd();
+            _gameController.OnHomeRunTriggerd(_multiplier);
         }
 
         _isHomeRun    = homeRun;
@@ -108,6 +116,8 @@ public class Ball : MonoBehaviour {
         _isHit = false;
         _isDetermined = false;
         _isFair = true;
+        
+        beacon.gameObject.SetActive(false);
 
         _transform.position = position;
 
