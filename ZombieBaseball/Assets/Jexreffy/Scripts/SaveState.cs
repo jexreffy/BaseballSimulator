@@ -44,7 +44,8 @@ public class SaveState {
         newSave.Save();
         return newSave;
     }
-    public static bool DoesSaveFileExist { get { return File.Exists(Application.persistentDataPath + SAVE_FILE_NAME);  } }
+    public static bool DoesSaveFileExist => File.Exists(Application.persistentDataPath + SAVE_FILE_NAME);
+
     private void ReconcileExistingSaveFile() {
         var shouldResave = false;
         if (_version < CURRENT_VERSION) {
