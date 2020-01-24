@@ -36,5 +36,5 @@ sysinfo.txt
 #*.unitypackage
 
 # Rider stuff
-ZombieBaseball/.idea/
-ZombieBaseball/Assets/Plugins/Editor/JetBrains/
+.idea/
+Assets/Plugins/Editor/JetBrains/
